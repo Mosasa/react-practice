@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
-import { getCarousel } from '@/api/recommend'
+import { getCarousel, getNewAlbum } from '@/api/recommend'
 import Swiper from 'swiper';
 import "swiper/dist/css/swiper.css"
 import './recommend.styl';
+import * as AlbumModel from '@/model/album'
+import Scroll from '@/common/scroll/Scroll'
 import { CODE_SUCCESS } from '../../api/config';
 
 class Recommend extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      sliderList: []
+      sliderList: [],
+      newAlbums: [],
+      refreshScroll: false
     }
   }
   componentDidMount () {
@@ -27,27 +31,88 @@ class Recommend extends Component {
           })
         })
       }
+    });
+    getNewAlbum().then(res => {
+      if(res) {
+        if(res.code === CODE_SUCCESS) {
+          let albumList = res.albumlib.data.list;
+          // console.log(albumList);
+          albumList.sort((a, b) => {
+            // a,b分别代表一组前后项
+            //sort自动遍历数组所有项
+            return new Date(b.public_time).getTime() - new Date(a.public_time).getTime();
+          });
+          this.setState({
+            newAlbums: albumList
+          }, () => {
+            this.setState({
+              refreshScroll: true
+            })
+          })
+          console.log(albumList)
+        }
+      }
     })
   }
+  toLink(linkUrl) {
+    // 箭头函数有效地解决了react里绑定事件this丢失的问题
+    return () => {
+      //闭包里，this对象会找到定义时的上下文环境
+      // console.log(this)
+      window.location.href = linkUrl;
+    }
+  } 
   render () {
+    const albums = this.state.newAlbums.map(item => {
+      console.log(item);
+      const album = AlbumModel.createAlbumByList(item);
+      return (
+        <div className="album-wrapper" key={album.mId}>
+          <div className="left">
+            <img src={album.img} width="100%" height="100%" alt={album.name}/>
+          </div>
+          <div className="right">
+            <div className="album-name">
+              {album.name}
+            </div>
+            <div className="singer-name">
+              {album.singer}
+            </div>
+            <div className="public-time">
+              {album.publicTime}
+            </div>
+          </div>
+        </div>
+      )
+    })
     return (
       <div className="music-recommend">
-        <div className="slider-container">
-          <div className="swiper-wrapper">
-            {
-              this.state.sliderList.map(slider => {//每个slider都负责返回一项数据(循环输出)
-                return (
-                  <div className="swiper-slide" key={slider.id}>
-                    <a href="" className="slider-nav">
-                      <img src={slider.picUrl} width="100%" height="100%" alt="推荐"/>
-                    </a>
-                  </div>
-                )
-              })
-            }
+        <Scroll refresh={this.state.refreshScroll}>
+          <div>
+            <div className="slider-container">
+            <div className="swiper-wrapper">
+              {
+                this.state.sliderList.map(slider => {//每个slider都负责返回一项数据(循环输出)
+                  return (
+                    <div className="swiper-slide" key={slider.id}>
+                      <a className="slider-nav" onClick={this.toLink(slider.linkUrl)}>
+                        <img src={slider.picUrl} width="100%" height="100%" alt="推荐"/>
+                      </a>
+                    </div>
+                  )
+                })
+              }
+            </div>
+            <div className="swiper-pagination"></div>
           </div>
-          <div className="swiper-pagination"></div>
+          <div className="album-container">
+            <h1 className="title">最新专辑</h1>
+            <div className="album-list">
+              {albums}{/* 循环输出域 */}
+            </div>
+          </div>
         </div>
+        </Scroll>
       </div>
     )
   }
