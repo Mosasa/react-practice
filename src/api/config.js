@@ -1,6 +1,7 @@
 const URL = {//负责管理url接口地址的管理
   carousel: 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg',
-  newalbum: 'https://u.y.qq.com/cgi-bin/musicu.fcg'
+  newalbum: 'https://u.y.qq.com/cgi-bin/musicu.fcg',
+  albumInfo: 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg'
 }
 
 const PARAM = {//在请求接口时有时需要带上参数

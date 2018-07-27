@@ -4,7 +4,10 @@ import Ranking from './ranking/Ranking';
 import Search from './search/Search';
 import { BrowserRouter as Router, Route, Switch, Redirect, NavLink } from 'react-router-dom'//as 将BrowserRouter用router替代
 import '@/assets/stylus/reset.styl';
+import '@/assets/stylus/font.styl';
 import logo from '@/assets/images/logo.png';//将图片作为资源引入
+import MusicPlayer from '@/components/play/MusicPlayer'
+// import MiniPlayer from '@/containers/MiniPlayer'
 import './App.styl';
 
 class App extends Component {
@@ -43,6 +46,8 @@ class App extends Component {
             <Route component={Recommend}/>{/* 默认为Recommend页面 */}
           </Switch>
         </div>
+        {/* <MiniPlayer></MiniPlayer> */}
+        <MusicPlayer></MusicPlayer>
       </div>
       </Router>
     );

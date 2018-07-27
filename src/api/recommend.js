@@ -13,7 +13,7 @@ export function getCarousel() {
 }
 
 // 有一个数据的需求，就到api相应业务文件下加一个方法就好
-export function getAlbumInfo(albumMid) {
+export function getAlbumInfo(albumMid) {//接口方法，前端调用.then()
   const data = Object.assign({}, PARAM, {
     albumid: albumMid,
     g_tk: 1278911659,

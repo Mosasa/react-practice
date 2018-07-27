@@ -4,8 +4,11 @@ import Swiper from 'swiper';
 import "swiper/dist/css/swiper.css"
 import './recommend.styl';
 import * as AlbumModel from '@/model/album'
-import Scroll from '@/common/scroll/Scroll'
+import Scroll from '@/common/scroll/Scroll';
+import Loading from '@/common/loading/Loading'
 import { CODE_SUCCESS } from '../../api/config';
+import Album from '@/containers/Album';
+import { Route } from 'react-router-dom';
 
 class Recommend extends Component {
   constructor (props) {
@@ -13,7 +16,8 @@ class Recommend extends Component {
     this.state = {
       sliderList: [],
       newAlbums: [],
-      refreshScroll: false
+      refreshScroll: false,
+      loading: true
     }
   }
   componentDidMount () {
@@ -43,7 +47,8 @@ class Recommend extends Component {
             return new Date(b.public_time).getTime() - new Date(a.public_time).getTime();
           });
           this.setState({
-            newAlbums: albumList
+            newAlbums: albumList,
+            loading: false
           }, () => {
             this.setState({
               refreshScroll: true
@@ -61,13 +66,21 @@ class Recommend extends Component {
       // console.log(this)
       window.location.href = linkUrl;
     }
-  } 
+  }
+  toAlbumDetail(url) {
+    return () => {
+      this.props.history.push({//通过url管理路由的对象，路由是一个(堆)栈，需要时直接插入数据
+        pathname: url
+      });
+    }
+  }
   render () {
+    const { match } = this.props;
     const albums = this.state.newAlbums.map(item => {
-      console.log(item);
+      // console.log(item);
       const album = AlbumModel.createAlbumByList(item);
       return (
-        <div className="album-wrapper" key={album.mId}>
+        <div className="album-wrapper" key={album.mId} onClick={this.toAlbumDetail(`${match.url + '/' + album.mId}`)}>
           <div className="left">
             <img src={album.img} width="100%" height="100%" alt={album.name}/>
           </div>
@@ -113,6 +126,8 @@ class Recommend extends Component {
           </div>
         </div>
         </Scroll>
+        <Loading title="正在加载中..." show={this.state.loading} />
+        <Route path={`${match.url+'/:id'}`} component={Album}></Route>
       </div>
     )
   }
